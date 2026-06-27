@@ -1,11 +1,15 @@
 import os
 import asyncio
+<<<<<<< HEAD
 from pathlib import Path
+=======
+>>>>>>> origin_main
 from openai import OpenAI
 from fastapi import HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 
+<<<<<<< HEAD
 # 优先从 .env.development / .env 加载环境变量（pydantic 自带 dotenv）
 try:
     from dotenv import load_dotenv
@@ -18,6 +22,8 @@ except ImportError:
     pass
 
 
+=======
+>>>>>>> origin_main
 class AnalysisRequest(BaseModel):
     statisticsData: Dict[str, Any]
     dateRange: List[str]
@@ -53,7 +59,11 @@ class AIAnalysisService:
             # 这样API调用会在单独的线程中执行，不会阻塞主事件循环
             response = await asyncio.to_thread(
                 self.client.chat.completions.create,
+<<<<<<< HEAD
                 model="deepseek-v4-flash",
+=======
+                model="deepseek-reasoner",
+>>>>>>> origin_main
                 messages=[
                     {
                         "role": "system", 
@@ -114,6 +124,7 @@ class AIAnalysisService:
         prompt += """
 请根据以上数据提供:
 1. 总体情况概述
+<<<<<<< HEAD
 2. 主要害虫分析（出现最多的前3种害虫）：使用标准 markdown 表格呈现，必须包含表头分隔行 `|---|---|`
 3. 发展趋势分析
 4. 防治建议：使用标准 markdown 列表或表格呈现
@@ -127,6 +138,15 @@ class AIAnalysisService:
   | 值1 | 值2 | 值3 |
 - 不要将整个回复包装在 markdown 代码块 (```) 中
 - 使用中文输出
+=======
+2. 主要害虫分析（出现最多的前3种害虫）
+3. 发展趋势分析
+4. 防治建议
+5. 风险预警（如果有必要）
+
+使用markdown格式输出，并确保内容专业、实用且易于理解。
+注意：请直接使用markdown语法，不要将整个回复包装在markdown代码块(```)中。
+>>>>>>> origin_main
 """
         return prompt
     

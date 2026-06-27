@@ -5,7 +5,11 @@ import os
 from typing import List, Dict, Any, Optional
 import asyncio
 from app.core.config import get_settings
+<<<<<<< HEAD
 from app.services.detector import detector, cv2_puttext_zh
+=======
+from app.services.detector import detector
+>>>>>>> origin_main
 import base64
 import time
 import uuid
@@ -151,6 +155,7 @@ class VideoProcessor:
             video_length = frame_count / fps if fps > 0 else 0
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+<<<<<<< HEAD
 
             print(f"[视频任务 {task_id}] 视频信息: {width}x{height}, {fps:.2f}fps, 总帧数 {frame_count}, 时长 {video_length:.2f}s")
 
@@ -187,11 +192,29 @@ class VideoProcessor:
 
             start_time = time.time()
 
+=======
+            
+            # 创建临时输出视频文件
+            output_path = f"{tempfile.gettempdir()}/{task_id}_annotated.webm"
+            fourcc = cv2.VideoWriter_fourcc(*'VP80')  # WebM格式
+            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            
+            # 初始化结果
+            results = []
+            processed_frames = 0
+            
+            start_time = time.time()
+            
+            # 每隔几帧处理一次（根据视频长度调整）
+            frame_interval = max(1, int(fps / 30))  # 每秒处理30帧
+            
+>>>>>>> origin_main
             frame_idx = 0
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
                     break
+<<<<<<< HEAD
 
                 # 按照间隔处理帧：目标每秒 4 帧
                 if frame_idx % frame_interval == 0:
@@ -244,24 +267,70 @@ class VideoProcessor:
                     timestamp_ms = int(frame_idx / fps * 1000)
                     results.append({
                         "timestamp": timestamp_ms,
+=======
+                    
+                # 创建原始帧的副本用于写入输出视频
+                output_frame = frame.copy()
+                
+                # 按照间隔处理帧
+                if frame_idx % frame_interval == 0:
+                    # 转换颜色空间
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    
+                    # 执行检测
+                    predictions = detector.predict(cv2.imencode('.jpg', frame_rgb)[1].tobytes())
+                    
+                    # 如果有检测结果，生成标注图像
+                    annotated_frame = None
+                    if predictions:
+                        # 绘制标注
+                        for pred in predictions:
+                            bbox = pred["bbox"]
+                            x1, y1, x2, y2 = int(bbox["x1"]), int(bbox["y1"]), int(bbox["x2"]), int(bbox["y2"])
+                            cv2.rectangle(output_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                            label = f"{pred['class']} {pred['confidence']:.2f}"
+                            cv2.putText(output_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                            
+                        # 编码为base64
+                        _, buffer = cv2.imencode('.jpg', output_frame)
+                        annotated_frame = "data:image/jpeg;base64," + base64.b64encode(buffer).decode('utf-8')
+                    
+                    # 添加到结果
+                    results.append({
+                        "timestamp": int(frame_idx / fps * 1000),  # 毫秒
+>>>>>>> origin_main
                         "frame_index": frame_idx,
                         "detections": predictions,
                         "annotated_frame": annotated_frame
                     })
+<<<<<<< HEAD
 
                     processed_frames += 1
 
                     # 只把处理过的帧写入输出视频
                     out.write(output_frame)
 
+=======
+                    
+                    processed_frames += 1
+                
+                # 所有帧都写入输出视频（无论是否处理过）
+                out.write(output_frame)
+                
+>>>>>>> origin_main
                 # 更新进度
                 progress = int((frame_idx / frame_count) * 100) if frame_count > 0 else 0
                 task_info["progress"] = progress
                 await redis.set(f"video_task:{task_id}", repr(task_info))
+<<<<<<< HEAD
 
                 frame_idx += 1
 
             print(f"[视频任务 {task_id}] 处理完成: 处理 {processed_frames} 帧, 总检测目标 {total_detections}")
+=======
+                
+                frame_idx += 1
+>>>>>>> origin_main
             
             # 释放资源
             cap.release()
@@ -276,10 +345,17 @@ class VideoProcessor:
             os.makedirs(static_dir, exist_ok=True)
             
             # 创建静态文件URL
+<<<<<<< HEAD
             annotated_video_url = f"/api/static/videos/{task_id}_annotated.mp4"
 
             # 将处理后的视频移动到静态文件目录
             final_path = os.path.join(static_dir, f"{task_id}_annotated.mp4")
+=======
+            annotated_video_url = f"/api/static/videos/{task_id}_annotated.webm" 
+            
+            # 将处理后的视频移动到静态文件目录
+            final_path = os.path.join(static_dir, f"{task_id}_annotated.webm")
+>>>>>>> origin_main
             
             # 在_process_video方法中替换os.rename
             try:

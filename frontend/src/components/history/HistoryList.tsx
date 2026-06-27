@@ -7,6 +7,10 @@ import {
     DeleteOutlined,
 } from '@ant-design/icons'
 import { HistoryRecord } from '../../types/history'
+<<<<<<< HEAD
+=======
+import { PestResult, VideoResult } from '../../types'
+>>>>>>> origin_main
 import type { ColumnsType } from 'antd/es/table'
 
 const { Text } = Typography
@@ -72,6 +76,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             key: 'result',
             render: (_, record) => {
                 if (record.type === 'image') {
+<<<<<<< HEAD
                     const predictions = record.result.predictions || []
 
                     if (predictions.length > 0) {
@@ -97,6 +102,48 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                     )
                 }
 
+=======
+                    const imgResult = record.result as PestResult
+
+                    // 处理标准结果格式
+                    if (imgResult.result) {
+                        return (
+                            <Tag color="green">
+                                {imgResult.result.pest} (
+                                {(imgResult.result.confidence * 100).toFixed(1)}
+                                %)
+                            </Tag>
+                        )
+                    }
+                    // 处理批量上传结果格式
+                    else if (
+                        imgResult.predictions &&
+                        imgResult.predictions.length > 0
+                    ) {
+                        const firstPred = imgResult.predictions[0]
+                        return (
+                            <Tag color="green">
+                                {firstPred.class || firstPred.pest} (
+                                {imgResult.predictions.length > 1
+                                    ? `+${imgResult.predictions.length - 1}项`
+                                    : ''}
+                                )
+                            </Tag>
+                        )
+                    }
+                    // 真的没检测到目标
+                    else {
+                        return <Tag color="orange">未检测到目标</Tag>
+                    }
+                } else if (record.type === 'video') {
+                    const videoResult = record.result as VideoResult
+                    return (
+                        <Tag color="green">
+                            {videoResult.processed_frames}帧
+                        </Tag>
+                    )
+                }
+>>>>>>> origin_main
                 return null
             },
         },

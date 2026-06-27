@@ -1,5 +1,10 @@
 import React from 'react'
+<<<<<<< HEAD
 import { Row, Col, Image, Descriptions, Tag } from 'antd'
+=======
+import { Row, Col, Image, Descriptions } from 'antd'
+import { PestResult } from '../../../types'
+>>>>>>> origin_main
 import { HistoryRecord } from '../../../types/history'
 
 interface ImageResultViewProps {
@@ -11,7 +16,11 @@ export const ImageResultView: React.FC<ImageResultViewProps> = ({
     record,
     formatDate,
 }) => {
+<<<<<<< HEAD
     const predictions = record.result.predictions || []
+=======
+    const imgResult = record.result as PestResult
+>>>>>>> origin_main
 
     return (
         <Row gutter={[16, 16]}>
@@ -30,6 +39,7 @@ export const ImageResultView: React.FC<ImageResultViewProps> = ({
                     <Descriptions.Item label="检测时间">
                         {formatDate(record.timestamp)}
                     </Descriptions.Item>
+<<<<<<< HEAD
                     <Descriptions.Item label="检测状态">
                         <Tag
                             color={
@@ -63,6 +73,57 @@ export const ImageResultView: React.FC<ImageResultViewProps> = ({
                             </Descriptions.Item>
                         </React.Fragment>
                     ))}
+=======
+                    <Descriptions.Item label="检测耗时">
+                        {imgResult.time_cost}秒
+                    </Descriptions.Item>
+
+                    {/* 处理标准结果格式 */}
+                    {imgResult.result && (
+                        <>
+                            <Descriptions.Item label="检测结果">
+                                {imgResult.result.pest}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="置信度">
+                                {(imgResult.result.confidence * 100).toFixed(2)}
+                                %
+                            </Descriptions.Item>
+                            {imgResult.result.description && (
+                                <Descriptions.Item label="描述">
+                                    {imgResult.result.description}
+                                </Descriptions.Item>
+                            )}
+                        </>
+                    )}
+
+                    {/* 处理批量上传的结果格式 */}
+                    {!imgResult.result &&
+                        imgResult.predictions &&
+                        imgResult.predictions.length > 0 && (
+                            <>
+                                <Descriptions.Item label="检测数量">
+                                    {imgResult.predictions.length}个目标
+                                </Descriptions.Item>
+                                {imgResult.predictions.map((pred, idx) => (
+                                    <React.Fragment key={idx}>
+                                        <Descriptions.Item
+                                            label={`目标 ${idx + 1} 类型`}
+                                        >
+                                            {pred.class || pred.pest}
+                                        </Descriptions.Item>
+                                        <Descriptions.Item
+                                            label={`目标 ${idx + 1} 置信度`}
+                                        >
+                                            {(
+                                                (pred.confidence || 0) * 100
+                                            ).toFixed(2)}
+                                            %
+                                        </Descriptions.Item>
+                                    </React.Fragment>
+                                ))}
+                            </>
+                        )}
+>>>>>>> origin_main
                 </Descriptions>
             </Col>
         </Row>

@@ -12,8 +12,11 @@ import {
 } from 'antd'
 import { ReloadOutlined, FileTextOutlined } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
+<<<<<<< HEAD
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
+=======
+>>>>>>> origin_main
 import { apiRequest } from '../../../utils/apiUtils'
 import {
     StatisticsDataType,
@@ -87,9 +90,15 @@ export const AIAnalysisReport: React.FC<AIAnalysisReportProps> = ({
                 comparisonData: formatComparisonData(),
             }
 
+<<<<<<< HEAD
             // 调用后端API（api 实例 baseURL 已包含 /api 前缀）
             const response = await apiRequest<AIAnalysisResponse>({
                 url: '/ai-analysis/',
+=======
+            // 调用后端API
+            const response = await apiRequest<AIAnalysisResponse>({
+                url: '/api/ai-analysis/',
+>>>>>>> origin_main
                 method: 'POST',
                 data: requestData,
             })
@@ -97,9 +106,19 @@ export const AIAnalysisReport: React.FC<AIAnalysisReportProps> = ({
             // 输出响应进行调试
             console.log('API响应数据:', response)
 
+<<<<<<< HEAD
             // 后端返回结构: { status: 'success', analysis: '...' }
             if (response.status === 'success' && response.analysis) {
                 const analysisData = response.analysis
+=======
+            // 修正这里：直接检查response.analysis而不是response.data.analysis
+            if (
+                response.status === 'success' &&
+                response.data &&
+                response.data.analysis
+            ) {
+                const analysisData = response.data.analysis
+>>>>>>> origin_main
                 setAnalysis(analysisData)
                 // 保存到localStorage
                 localStorage.setItem('aiAnalysisReport', analysisData)
@@ -187,6 +206,7 @@ export const AIAnalysisReport: React.FC<AIAnalysisReportProps> = ({
         }
 
         return (
+<<<<<<< HEAD
             <div className="markdown-content" style={markdownStyles.container}>
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -238,6 +258,13 @@ export const AIAnalysisReport: React.FC<AIAnalysisReportProps> = ({
 
                 {lastUpdateTime && (
                     <div style={{ marginTop: 24, textAlign: 'right' }}>
+=======
+            <div className="markdown-content">
+                <ReactMarkdown>{analysis}</ReactMarkdown>
+
+                {lastUpdateTime && (
+                    <div style={{ marginTop: 16, textAlign: 'right' }}>
+>>>>>>> origin_main
                         <Text type="secondary">更新于: {lastUpdateTime}</Text>
                     </div>
                 )}
@@ -281,6 +308,7 @@ export const AIAnalysisReport: React.FC<AIAnalysisReportProps> = ({
     )
 }
 
+<<<<<<< HEAD
 // Markdown 渲染样式：实验室报告 / 档案卡片风格
 const markdownStyles: Record<string, React.CSSProperties> = {
     container: {
@@ -366,4 +394,6 @@ const markdownStyles: Record<string, React.CSSProperties> = {
     },
 }
 
+=======
+>>>>>>> origin_main
 export default AIAnalysisReport

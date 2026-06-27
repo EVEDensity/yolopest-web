@@ -25,6 +25,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 )
 
+<<<<<<< HEAD
 // 响应拦截器：统一处理 401，清除 token 并跳转登录页
 api.interceptors.response.use(
     (response) => response,
@@ -38,6 +39,8 @@ api.interceptors.response.use(
     }
 )
 
+=======
+>>>>>>> origin_main
 export default api
 
 // 图片检测API

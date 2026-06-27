@@ -1,5 +1,6 @@
 from ultralytics import YOLO
 from app.core.config import get_settings
+<<<<<<< HEAD
 from app.services.pest_translator import to_chinese, get_pest_aliases
 import cv2
 import numpy as np
@@ -103,6 +104,15 @@ def cv2_puttext_zh(img_bgr: np.ndarray, text: str, pos: tuple, color=(0, 255, 0)
     # 转回 BGR
     return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
+=======
+import cv2
+import numpy as np
+from typing import List, Dict
+import base64
+
+settings = get_settings()
+
+>>>>>>> origin_main
 class PestDetector:
     def __init__(self):
         print(f"[DEBUG] 正在加载模型，路径: {settings.model_path}")
@@ -118,6 +128,7 @@ class PestDetector:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return img
 
+<<<<<<< HEAD
     def predict(self, image_bytes: bytes, conf_threshold: Optional[float] = None) -> List[Dict]:
         """执行预测"""
         try:
@@ -128,6 +139,16 @@ class PestDetector:
                 img,
                 imgsz=self.img_size,
                 conf=threshold,
+=======
+    def predict(self, image_bytes: bytes) -> List[Dict]:
+        """执行预测"""
+        try:
+            img = self.preprocess(image_bytes)
+            results = self.model(
+                img, 
+                imgsz=self.img_size,
+                conf=self.conf_thresh,
+>>>>>>> origin_main
                 verbose=False  # 关闭冗余日志
             )
             return self.parse_results(results)
@@ -136,6 +157,7 @@ class PestDetector:
             return []
     
     def annotate_image(self, image_bytes: bytes, predictions: List[Dict]) -> str:
+<<<<<<< HEAD
         """绘制标注框并返回base64编码的图像（支持中文标签）"""
         try:
             # 使用与预测相同的预处理获取RGB格式图像
@@ -145,10 +167,25 @@ class PestDetector:
 
             if predictions and len(predictions) > 0:
                 for pred in predictions:
+=======
+        """绘制标注框并返回base64编码的图像"""
+        try:
+            # 使用与预测相同的预处理获取RGB格式图像
+            img_rgb = self.preprocess(image_bytes)
+            
+            # 使用已有的预测结果，避免重复调用模型
+            if predictions and len(predictions) > 0:
+                # 从已有的预测结果构建要显示的边界框
+                img_with_boxes = img_rgb.copy()
+                
+                for pred in predictions:
+                    # 获取边界框坐标
+>>>>>>> origin_main
                     x1 = int(pred["bbox"]["x1"])
                     y1 = int(pred["bbox"]["y1"])
                     x2 = int(pred["bbox"]["x2"])
                     y2 = int(pred["bbox"]["y2"])
+<<<<<<< HEAD
 
                     # 根据置信度选择框颜色
                     conf = pred.get("confidence", 0)
@@ -169,16 +206,41 @@ class PestDetector:
                     label = f"{label_name} {conf:.2f}"
                     img_bgr = cv2_puttext_zh(img_bgr, label, (x1, y1 - 2), color=box_color, font_size=18)
 
+=======
+                    
+                    # 绘制边界框
+                    cv2.rectangle(img_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    
+                    # 绘制标签
+                    label = f"{pred['class']} {pred['confidence']:.2f}"
+                    cv2.putText(img_with_boxes, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 
+                               0.5, (0, 255, 0), 2)
+                
+                # 转回BGR用于OpenCV处理
+                img_bgr = cv2.cvtColor(img_with_boxes, cv2.COLOR_RGB2BGR)
+            else:
+                # 如果没有预测结果，使用原始图像
+                img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+            
+>>>>>>> origin_main
             # 使用更高质量参数进行JPEG编码
             _, buffer = cv2.imencode('.jpg', img_bgr, [cv2.IMWRITE_JPEG_QUALITY, 95])
             if buffer is None:
                 raise ValueError("图像编码失败")
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> origin_main
             base64_image = base64.b64encode(buffer).decode('utf-8')
             return f"data:image/jpeg;base64,{base64_image}"
         except Exception as e:
             print(f"标注图像时出错: {str(e)}")
             try:
+<<<<<<< HEAD
+=======
+                # 如果标注失败，返回原始图像
+>>>>>>> origin_main
                 nparr = np.frombuffer(image_bytes, np.uint8)
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                 _, buffer = cv2.imencode('.jpg', img)
@@ -226,6 +288,7 @@ class PestDetector:
 
     @staticmethod
     def parse_results(results) -> List[Dict]:
+<<<<<<< HEAD
         """解析YOLO输出结果（带中英对照）"""
         predictions = []
         for result in results:
@@ -239,6 +302,14 @@ class PestDetector:
                     "class_zh": zh_name,         # 中文名（显式）
                     "class_id": cls_id,          # 类别 ID
                     "aliases": get_pest_aliases(en_name),  # 别名列表
+=======
+        """解析YOLO输出结果"""
+        predictions = []
+        for result in results:
+            for box in result.boxes:
+                predictions.append({
+                    "class": result.names[int(box.cls)],
+>>>>>>> origin_main
                     "confidence": float(box.conf),
                     "bbox": {
                         "x1": int(box.xyxy[0][0]),

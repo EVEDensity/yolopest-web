@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -11,3 +12,8 @@ class Base(DeclarativeBase):
     老式的 Column 风格模型（Detection、History）同样适用。
     """
     pass
+=======
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+>>>>>>> origin_main

@@ -1,6 +1,10 @@
 import React from 'react'
+<<<<<<< HEAD
 import { Tag, Tooltip, Progress } from 'antd'
 import { InfoCircleOutlined, AimOutlined, RiseOutlined, FallOutlined, MinusOutlined } from '@ant-design/icons'
+=======
+import { Tag } from 'antd'
+>>>>>>> origin_main
 import { DetectionItem } from '../../../types'
 
 interface DetectionItemDisplayProps {
@@ -12,6 +16,7 @@ const DetectionItemDisplay: React.FC<DetectionItemDisplayProps> = ({
     prediction,
     index,
 }) => {
+<<<<<<< HEAD
     const zhName = prediction.class_zh || prediction.class
     const enName = prediction.class_en
     const aliases = prediction.aliases || []
@@ -201,6 +206,27 @@ const DetectionItemDisplay: React.FC<DetectionItemDisplayProps> = ({
                     </Tooltip>
                 )}
             </div>
+=======
+    return (
+        <div key={index} style={{ marginBottom: 8 }}>
+            <p>
+                害虫类型: <Tag color="blue">{prediction.class}</Tag>
+            </p>
+            <p>
+                置信度:{' '}
+                <Tag color="green">
+                    {(prediction.confidence * 100).toFixed(1)}%
+                </Tag>
+            </p>
+            {prediction.bbox && (
+                <p>
+                    位置: X[{Math.round(prediction.bbox.x1)}-
+                    {Math.round(prediction.bbox.x2)}] Y[
+                    {Math.round(prediction.bbox.y1)}-
+                    {Math.round(prediction.bbox.y2)}]
+                </p>
+            )}
+>>>>>>> origin_main
         </div>
     )
 }

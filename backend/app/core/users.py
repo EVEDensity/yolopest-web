@@ -59,6 +59,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ) -> User:
         """
         创建用户并持久化到数据库中。
+<<<<<<< HEAD
 
         兼容 fastapi-users 14.0.1：直接构造 user_dict 而不依赖 create_update_dict
         """
@@ -83,6 +84,30 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         await self.on_after_register(created_user, request)
 
+=======
+        
+        这是为了兼容旧版本的 fastapi-users 或修复 create_update_dict 缺失问题
+        """
+        await self.validate_password(user_create.password, user_create)
+
+        # 使用直接访问属性替代 create_update_dict
+        user_dict = {
+            "email": user_create.email,
+            "hashed_password": self.password_helper.hash(user_create.password),
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+        }
+        
+        # 添加其他字段
+        if hasattr(user_create, "username"):
+            user_dict["username"] = user_create.username
+
+        created_user = await self.user_db.create(user_dict)
+        
+        await self.on_after_register(created_user, request)
+        
+>>>>>>> origin_main
         return created_user
 
 # 获取用户管理器
