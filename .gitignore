@@ -5,6 +5,9 @@
 .vscode/
 .idea/
 
+# Claude Code 配置（包含本地权限路径，不要提交）
+.claude/
+
 # 环境变量密钥文件（所有层级，绝不允许提交）
 .env
 .env.*
