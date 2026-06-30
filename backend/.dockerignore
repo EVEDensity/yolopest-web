@@ -1,0 +1,11 @@
+.venv
+.git
+__pycache__
+*.pyc
+.env
+.env.*
+*.pt
+model_weights/
+app/static/
+pest_Uniapp_backend/
+*.md

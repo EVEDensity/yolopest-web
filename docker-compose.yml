@@ -1,0 +1,85 @@
+services:
+    frontend:
+        build:
+            context: ./frontend
+            args:
+                VITE_API_URL: /api
+                VITE_API_MULTIPLE_URL: /api/detection/upload-multiple
+                VITE_API_VIDEO_URL: /api/video/process-async
+        ports:
+            - '80:80'
+        depends_on:
+            backend:
+                condition: service_healthy
+        env_file:
+            - ./.env # 指定环境文件
+        environment:
+            - NODE_ENV=production
+        networks:
+            - yolopest-network
+        restart: unless-stopped
+
+    backend:
+        build: ./backend
+        ports:
+            - '8000:8000'
+        depends_on:
+            db:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        env_file:
+            - ./.env # 指定环境文件
+        environment:
+            - PYTHONUNBUFFERED=1
+            # 容器内通信 — 数据库/Redis 用服务名替代 localhost
+            - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+            - REDIS_URL=redis://redis:6379/0
+            # 静态文件外网访问地址 — Docker空值→相对路径（nginx反代处理）
+            # 小程序需要完整域名时改为 http(s)://你的域名
+            - API_BASE_URL=
+        volumes:
+            # 模型权重文件（大文件，不要打进镜像）
+            - ./backend/model_weights:/app/model_weights
+            # 上传的图片/视频/结果持久化
+            - static_data:/app/app/static
+        networks:
+            - yolopest-network
+        healthcheck:
+            test: ['CMD-SHELL', 'python -c "import urllib.request; urllib.request.urlopen(\"http://localhost:8000/\")"']
+            interval: 15s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+        restart: unless-stopped
+
+    db:
+        image: postgres:17.4-alpine
+        env_file:
+            - ./.env
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - yolopest-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER}']
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+    redis: # 用于缓存和异步任务
+        image: redis:7.4.2
+        volumes:
+            - redis_data:/data
+        networks:
+            - yolopest-network
+        restart: unless-stopped
+
+networks:
+    yolopest-network:
+
+volumes:
+    postgres_data:
+    redis_data:
+    static_data:

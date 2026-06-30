@@ -1,0 +1,84 @@
+# ============================================================
+# Yolo-Pest 生产部署文件
+# 使用方式:
+#   1. 复制此文件和 .env 到部署目录
+#   2. 将模型文件放到 ./model_weights/best.pt
+#   3. 编辑 .env 修改密钥和域名
+#   4. docker compose -f docker-compose.deploy.yml up -d
+# ============================================================
+
+services:
+    frontend:
+        image: ${FRONTEND_IMAGE:-evedensity/yolo-pest-frontend:v1}
+        ports:
+            - '80:80'
+        depends_on:
+            backend:
+                condition: service_healthy
+        environment:
+            - NODE_ENV=production
+        networks:
+            - yolopest-network
+        restart: unless-stopped
+
+    backend:
+        image: ${BACKEND_IMAGE:-evedensity/yolo-pest:v1}
+        ports:
+            - '8000:8000'
+        depends_on:
+            db:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        env_file:
+            - ./.env
+        environment:
+            - PYTHONUNBUFFERED=1
+            - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+            - REDIS_URL=redis://redis:6379/0
+            # 空值 → 相对路径 /api/static/... （nginx 反代）
+            # 需要小程序访问时改为 https://你的域名
+            - API_BASE_URL=${API_BASE_URL:-}
+        volumes:
+            - ./model_weights:/app/model_weights
+            - static_data:/app/app/static
+        networks:
+            - yolopest-network
+        healthcheck:
+            test: ['CMD-SHELL', 'python -c "import urllib.request; urllib.request.urlopen(\"http://localhost:8000/\")"']
+            interval: 15s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+        restart: unless-stopped
+
+    db:
+        image: postgres:17.4-alpine
+        env_file:
+            - ./.env
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - yolopest-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER}']
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+    redis:
+        image: redis:7.4.2
+        volumes:
+            - redis_data:/data
+        networks:
+            - yolopest-network
+        restart: unless-stopped
+
+networks:
+    yolopest-network:
+
+volumes:
+    postgres_data:
+    redis_data:
+    static_data:
