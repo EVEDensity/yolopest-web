@@ -1,2 +1,6 @@
 # 忽略环境文件
 /backend-old
+
+# 环境变量密钥文件
+backend/.env*
+!backend/.env.template
