@@ -8,3 +8,8 @@
 /app/static/annotated/*
 /app/static/uploads/*
 /app/static/videos/*
+/app/static/images/*
+/app/static/results/*
+
+# 用户头像（运行时数据）
+/static/avatars/*

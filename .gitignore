@@ -1,6 +1,18 @@
 # 忽略环境文件
 /backend-old
 
-# 环境变量密钥文件
-backend/.env*
+# IDE 配置（每个人的IDE不同，不要提交）
+.vscode/
+.idea/
+
+# 环境变量密钥文件（所有层级，绝不允许提交）
+.env
+.env.*
+!.env.example
 !backend/.env.template
+
+# 旧版后端副本
+backend/pest_Uniapp_backend/
+
+# 无意义文件
+backend/.jpg
