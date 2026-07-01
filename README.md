@@ -75,8 +75,8 @@ cd backend
 
 # 创建并激活虚拟环境
 python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# 或 .venv\Scripts\activate  # Windows
+#source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate  # Windows
 
 # 安装依赖
 pip install -r requirements.txt
